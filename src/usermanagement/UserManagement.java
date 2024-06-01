@@ -1,18 +1,26 @@
 package usermanagement;
 
-import java.util.Scanner;
-import static usermanagement.util.FileHandler.*;
+import java.util.*;
 import static usermanagement.Menu.*;
+import usermanagement.util.FileHandler;
 import static usermanagement.validation.UserInputValidator.*;
 
 public class UserManagement {
-    
-    public static final String FILE_NAME = "data/userData.txt";
+public static final String FILE_NAME = "userData.txt";
+
+        public static void loadUsersFromFile() {
+        USER_DATABASE = FileHandler.loadUsersFromFile(FILE_NAME);
+    }
+
+    public static void saveToFile() {
+        FileHandler.saveToFile(FILE_NAME, USER_DATABASE);
+    }
+
 
     public static void main(String[] args) {
         loadUsersFromFile();
         Scanner sc = new Scanner(System.in);
-        
+
         while (true) {
             displayMainMenu();
             int option = getUserOption(sc);
@@ -35,7 +43,7 @@ public class UserManagement {
                     saveToFile();
                     break;
                 case 6:
-                    printListFromFile();
+                    FileHandler.printListFromFile(USER_DATABASE);
                     break;
                 case 7: {
                     saveToFile(); // Save before exiting
@@ -51,5 +59,4 @@ public class UserManagement {
             }
         }
     }
-
 }

@@ -1,10 +1,8 @@
 package usermanagement.encryption;
 
-import java.security.MessageDigest; // hash functions -> Create the hash code of the password in the form of byte array
-import java.security.NoSuchAlgorithmException; /* exeption thrown when the algorithm is not found during the encryption process. 
-                                                                    In this case, it is used to handle cases when the hash algorithm is not available, such as SHA-256.*/
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
-// This class handles password encryption using the SHA-256 algorithm
 public class PasswordEncryptor {
 
     // Method to encrypt a password using SHA-256 algorithm
@@ -30,3 +28,4 @@ public class PasswordEncryptor {
         }
     }
 }
+

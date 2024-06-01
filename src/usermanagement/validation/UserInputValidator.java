@@ -1,8 +1,8 @@
 package usermanagement.validation;
 
+import java.util.ArrayList;
 import usermanagement.model.User;
-import java.util.HashMap;
-import java.util.Map;
+
 import java.util.Scanner;
 import static usermanagement.Menu.*;
 import static usermanagement.encryption.PasswordEncryptor.*;
@@ -12,10 +12,11 @@ public class UserInputValidator {
 
     private static final int MIN_USERNAME_LENGTH = 5; // Minimum length for a username
     private static final int MIN_PASSWORD_LENGTH = 6; // Minimum length for a password
-    public static final Map<String, User> USER_DATABASE = new HashMap<>(); // Database of users
+    public static ArrayList<User> USER_DATABASE = new ArrayList<>(); // Database of users
 
     // Validates general input based on regex pattern
     public static String getInput(Scanner sc, String fieldName, String regex, String errorMessage) {
+        System.out.println("Phone number must contain exactly 10 digits");
         System.out.print("Enter " + fieldName + ": ");
         String input = sc.nextLine();
         if (!input.matches(regex)) {
@@ -33,9 +34,11 @@ public class UserInputValidator {
             System.out.println("Username must be at least " + MIN_USERNAME_LENGTH + " characters long and contain no spaces. Try again.");
             return null;
         }
-        if (USER_DATABASE.containsKey(username)) {
-            System.out.println("Username already exists. Try again.");
-            return null;
+        for (User user : USER_DATABASE) {
+            if (user.getUsername().equals(username)) {
+                System.out.println("Username already exists. Try again.");
+                return null;
+            }
         }
         return username;
     }
@@ -59,6 +62,7 @@ public class UserInputValidator {
         System.out.print("Enter last name: ");
         String lastName = sc.nextLine();
 
+        
         String phoneNumber = getInput(sc, "phone number", "\\d{10}", "Phone number must contain exactly 10 digits. Try again.");
         if (phoneNumber == null) {
             return;
@@ -88,7 +92,7 @@ public class UserInputValidator {
 
         String encryptedPassword = encryptPassword(password);
         User newUser = new User(username, firstName, lastName, encryptedPassword, phoneNumber, email);
-        USER_DATABASE.put(username, newUser);
+        USER_DATABASE.add(newUser);
         System.out.println("User account created successfully.");
     }
 
@@ -96,26 +100,45 @@ public class UserInputValidator {
     public static void checkExistUser(Scanner sc) {
         System.out.print("Enter username to check: ");
         String username = sc.nextLine();
-        if (USER_DATABASE.containsKey(username)) {
-            System.out.println("Username exists.");
-        } else {
-            System.out.println("Username does not exist.");
+        boolean exists = false;
+        for (User user : USER_DATABASE) {
+            if (user.getUsername().equals(username)) {
+                exists = true;
+                break;
+            }
+        }   
+        if (exists) {
+            System.out.println("Username existed.");
         }
+        else System.out.println("Username does not exists.");
     }
+    public static String padSpaces(String value, int length) {
+        int spacesToAdd = length - value.length();
+        StringBuilder spaces = new StringBuilder();
 
+        for (int i = 0; i < spacesToAdd; i++) {
+            spaces.append(" ");
+        }
+
+        return spaces.toString();
+    }
     // Searches for user information
     public static void searchUserInformation(Scanner sc) {
         System.out.print("Enter username substring to search: ");
         String substring = sc.nextLine();
         boolean found = false;
 
-        for (User user : USER_DATABASE.values()) {
+        for (User user : USER_DATABASE) {
             if (user.getUsername().contains(substring)) {
-                System.out.println("Username: " + user.getUsername());
-                System.out.println("First Name: " + user.getFirstName());
-                System.out.println("Last Name: " + user.getLastName());
-                System.out.println("Email: " + user.getEmail());
-                System.out.println("Phone Number: " + user.getPhoneNumber());
+                System.out.println("+----------------------------------------+");
+                System.out.println("|          User Information              |");
+                System.out.println("+----------------------------------------+");
+                System.out.println("| Username:      " + user.getUsername() + padSpaces(user.getUsername(), 24) + "|");
+                System.out.println("| First Name:    " + user.getFirstName() + padSpaces(user.getFirstName(), 24) + "|");
+                System.out.println("| Last Name:     " + user.getLastName() + padSpaces(user.getLastName(), 24) + "|");
+                System.out.println("| Email:         " + user.getEmail() + padSpaces(user.getEmail(), 24) + "|");
+                System.out.println("| Phone Number:  " + user.getPhoneNumber() + padSpaces(user.getPhoneNumber(), 24) + "|");
+                System.out.println("+----------------------------------------+");
                 System.out.println();
                 found = true;
             }
@@ -127,20 +150,31 @@ public class UserInputValidator {
     }
 
     // Updates user information
-    public static void updateUser(Scanner sc) {
+ public static void updateUser(Scanner sc) {
         System.out.print("Enter username: ");
         String username = sc.nextLine();
-        if (!USER_DATABASE.containsKey(username)) {
+
+        User user = null;
+        for (User u : USER_DATABASE) {
+            if (u.getUsername().equals(username)) {
+                user = u;
+                break;
+            }
+        }
+
+        if (user == null) {
             System.out.println("Username does not exist.");
             return;
         }
+
         System.out.print("Enter password: ");
         String password = sc.nextLine();
-        User user = USER_DATABASE.get(username);
+
         if (!user.getPassword().equals(encryptPassword(password))) {
             System.out.println("Incorrect password.");
             return;
         }
+
         updateUserOptions(sc, user);
     }
 
@@ -177,7 +211,12 @@ public class UserInputValidator {
 
     // Deletes a user
     public static void deleteUser(User user) {
-        USER_DATABASE.remove(user.getUsername());
-        System.out.println("User deleted successfully.");
+        boolean removed = USER_DATABASE.remove(user);
+
+        if (removed) {
+            System.out.println("User deleted successfully.");
+        } else {
+            System.out.println("Failed to delete user. User not found.");
+        }
     }
 }
