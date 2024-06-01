@@ -1,10 +1,8 @@
 package usermanagement.util;
 
 import usermanagement.model.User;
-
 import java.io.*;
 import java.util.ArrayList;
-
 
 // This class handles file operations for user data
 public class FileHandler {

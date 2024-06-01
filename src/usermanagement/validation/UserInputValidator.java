@@ -16,7 +16,7 @@ public class UserInputValidator {
 
     // Validates general input based on regex pattern
     public static String getInput(Scanner sc, String fieldName, String regex, String errorMessage) {
-        System.out.println("Phone number must contain exactly 10 digits");
+
         System.out.print("Enter " + fieldName + ": ");
         String input = sc.nextLine();
         if (!input.matches(regex)) {
@@ -28,72 +28,114 @@ public class UserInputValidator {
 
     // Validates username input
     public static String getUsername(Scanner sc) {
-        System.out.print("Enter username: ");
-        String username = sc.nextLine();
-        if (username.length() < MIN_USERNAME_LENGTH || username.contains(" ")) {
-            System.out.println("Username must be at least " + MIN_USERNAME_LENGTH + " characters long and contain no spaces. Try again.");
-            return null;
-        }
-        for (User user : USER_DATABASE) {
-            if (user.getUsername().equals(username)) {
-                System.out.println("Username already exists. Try again.");
-                return null;
+        while (true) {
+            System.out.print("Enter username: ");
+            String username = sc.nextLine();
+
+            if (username.length() < MIN_USERNAME_LENGTH || username.contains(" ")) {
+                System.out.println("Username must be at least " + MIN_USERNAME_LENGTH + " characters long and contain no spaces. Try again.");
+            } else {
+                boolean usernameExists = false;
+                for (User user : USER_DATABASE) {
+                    if (user.getUsername().equals(username)) {
+                        System.out.println("Username already exists. Try again.");
+                        usernameExists = true;
+                        break;
+                    }
+                }
+                if (!usernameExists) {
+                    return username;
+                }
             }
         }
-        return username;
     }
 
     // Validates password input
     public static String getPassword(Scanner sc) {
-        System.out.print("Enter password: ");
-        String password = sc.nextLine();
-        if (password.length() < MIN_PASSWORD_LENGTH || password.contains(" ")) {
-            System.out.println("Password must be at least " + MIN_PASSWORD_LENGTH + " characters long and contain no spaces. Try again.");
-            return null;
+        while (true) {
+            System.out.print("Enter password: ");
+            String pw = sc.nextLine();
+            if (pw.length() < MIN_PASSWORD_LENGTH || pw.contains(" ")) {
+                System.out.println("Password must be at least " + MIN_PASSWORD_LENGTH + " characters long and contain no spaces. Try again.");
+            } else {
+                return pw;
+            }
         }
-        return password;
     }
 
     // Creates a new user account
     public static void createUserAccount(Scanner sc) {
-        System.out.print("Enter first name: ");
-        String firstName = sc.nextLine();
 
-        System.out.print("Enter last name: ");
-        String lastName = sc.nextLine();
+        String firstName;
+        String lastName;
+        String phoneNumber;
+        String email;
+        String username;
+        String password;
+        String confirmPassword;
 
-        
-        String phoneNumber = getInput(sc, "phone number", "\\d{10}", "Phone number must contain exactly 10 digits. Try again.");
-        if (phoneNumber == null) {
-            return;
+        while (true) {
+            System.out.print("Enter first name: ");
+            firstName = sc.nextLine();
+
+            System.out.print("Enter last name: ");
+            lastName = sc.nextLine();
+
+            phoneNumber = getPhoneNumber(sc);
+            if (phoneNumber == null) {
+                continue;
+            }
+
+            email = getEmail(sc);
+            if (email == null) {
+                continue;
+            }
+
+            username = getUsername(sc);
+            if (username == null) {
+                continue;
+            }
+
+            password = getPassword(sc);
+            if (password == null) {
+                continue;
+            }
+
+            System.out.print("Confirm password: ");
+            confirmPassword = sc.nextLine();
+            if (!confirmPassword.equals(password)) {
+                System.out.println("Passwords do not match. Try again.");
+                continue;
+            }
+
+            // If all components are successfully entered, break out of the loop
+            break;
         }
 
-        String email = getInput(sc, "email", "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$", "Invalid email format. Try again.");
-        if (email == null) {
-            return;
-        }
-
-        String username = getUsername(sc);
-        if (username == null) {
-            return;
-        }
-
-        String password = getPassword(sc);
-        if (password == null) {
-            return;
-        }
-
-        System.out.print("Confirm password: ");
-        String confirmPassword = sc.nextLine();
-        if (!confirmPassword.equals(password)) {
-            System.out.println("Passwords do not match. Try again.");
-            return;
-        }
-
+        // Use the obtained data as needed
         String encryptedPassword = encryptPassword(password);
         User newUser = new User(username, firstName, lastName, encryptedPassword, phoneNumber, email);
         USER_DATABASE.add(newUser);
         System.out.println("User account created successfully.");
+    }
+
+    public static String getPhoneNumber(Scanner sc) {
+        System.out.println("*NOTE: Phone number must contain exactly 10 digits");
+        while (true) {
+            String phoneNumber = getInput(sc, "phone number", "\\d{10}", "Phone number must contain exactly 10 digits. Try again.");
+            if (phoneNumber != null) {
+                return phoneNumber;
+            }
+        }
+    }
+
+    public static String getEmail(Scanner sc) {
+        while (true) {
+            String email = getInput(sc, "email", "^[A-Za-z0-9+_.-]+@(gmail\\.com|yahoo\\.com|fpt\\.edu\\.vn)$", "Invalid email format. Try again.");
+            if (email != null) {
+                return email;
+            }
+        }
     }
 
     // Checks if a user exists
@@ -106,12 +148,14 @@ public class UserInputValidator {
                 exists = true;
                 break;
             }
-        }   
+        }
         if (exists) {
             System.out.println("Username existed.");
+        } else {
+            System.out.println("Username does not exists.");
         }
-        else System.out.println("Username does not exists.");
     }
+
     public static String padSpaces(String value, int length) {
         int spacesToAdd = length - value.length();
         StringBuilder spaces = new StringBuilder();
@@ -122,6 +166,7 @@ public class UserInputValidator {
 
         return spaces.toString();
     }
+
     // Searches for user information
     public static void searchUserInformation(Scanner sc) {
         System.out.print("Enter username substring to search: ");
@@ -150,7 +195,7 @@ public class UserInputValidator {
     }
 
     // Updates user information
- public static void updateUser(Scanner sc) {
+    public static void updateUser(Scanner sc) {
         System.out.print("Enter username: ");
         String username = sc.nextLine();
 
@@ -199,14 +244,20 @@ public class UserInputValidator {
 
     // Updates user password
     public static void updatePassword(Scanner sc, User user) {
-        System.out.print("Enter new password: ");
-        String newPassword = sc.nextLine();
-        if (newPassword.length() < MIN_PASSWORD_LENGTH || newPassword.contains(" ")) {
-            System.out.println("Password must be at least " + MIN_PASSWORD_LENGTH + " characters long and contain no spaces. Try again.");
-            return;
+        boolean validPassword = false;
+
+        while (!validPassword) {
+            System.out.print("Enter new password: ");
+            String newPassword = sc.nextLine();
+
+            if (newPassword.length() < MIN_PASSWORD_LENGTH || newPassword.contains(" ")) {
+                System.out.println("Password must be at least " + MIN_PASSWORD_LENGTH + " characters long and contain no spaces. Try again.");
+            } else {
+                user.setPassword(encryptPassword(newPassword));
+                System.out.println("Password updated successfully.");
+                validPassword = true;
+            }
         }
-        user.setPassword(encryptPassword(newPassword));
-        System.out.println("Password updated successfully.");
     }
 
     // Deletes a user
@@ -219,4 +270,5 @@ public class UserInputValidator {
             System.out.println("Failed to delete user. User not found.");
         }
     }
+
 }
