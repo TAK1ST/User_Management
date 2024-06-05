@@ -1,11 +1,11 @@
 package usermanagement.model;
 
-import java.io.Serializable;
+import java.io.Serializable; //Serializable, nó cho phép các OOP in class đó can tuan tu hoá (serialize) và giai tuan tu hóa (deserialize).
 
 // Represents a user in the system
 public class User implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L; //serialVersionUID is a unique was used to xac dinh class version khi serialize
     private final String username; // User's username
     private final String firstName; // User's first name
     private final String lastName; // User's last name

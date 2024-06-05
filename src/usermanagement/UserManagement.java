@@ -3,7 +3,7 @@ package usermanagement;
 import java.util.*;
 import static usermanagement.Menu.*;
 import usermanagement.util.FileHandler;
-import static usermanagement.validation.UserInputValidator.*;
+import static usermanagement.util.Service.*;
 
 public class UserManagement {
 

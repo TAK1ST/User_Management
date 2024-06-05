@@ -1,30 +1,18 @@
-package usermanagement.validation;
+package usermanagement.util;
 
 import java.util.ArrayList;
 import usermanagement.model.User;
-
 import java.util.Scanner;
 import static usermanagement.Menu.*;
 import static usermanagement.encryption.PasswordEncryptor.*;
-
+import static usermanagement.validation.UserInputValidation.*;
 // This class validates user input and performs user-related operations
-public class UserInputValidator {
+public class Service {
 
     private static final int MIN_USERNAME_LENGTH = 5; // Minimum length for a username
     private static final int MIN_PASSWORD_LENGTH = 6; // Minimum length for a password
     public static ArrayList<User> USER_DATABASE = new ArrayList<>(); // Database of users
 
-    // Validates general input based on regex pattern
-    public static String getInput(Scanner sc, String fieldName, String regex, String errorMessage) {
-
-        System.out.print("Enter " + fieldName + ": ");
-        String input = sc.nextLine();
-        if (!input.matches(regex)) {
-            System.out.println(errorMessage);
-            return null;
-        }
-        return input;
-    }
 
     // Validates username input
     public static String getUsername(Scanner sc) {
